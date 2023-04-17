@@ -1,42 +1,26 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const Register = ({ navigation }) => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmpassword, setConfirmPassword] = useState("");
+const Login = ({ updateToken, navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState("");
   const loginHandler = async (e) => {
     e.preventDefault();
     setError('')
-    if (password !== confirmpassword) {
-      setPassword("");
-      setConfirmPassword("");
-      setTimeout(() => {
-        setError("");
-      }, 8000);
-      return setError("Passwords do not match");
-    }
+
     try {
       const URI = 'http://localhost:5000'
       const { data } = await axios.post(
-        `${URI}/auth/register`,
-        {
-          username,
-          email,
-          password,
-        }
+        `${URI}/auth/login`,
+        { email, password }
       );
       await AsyncStorage.setItem("authToken", data.token);
 
-      setTimeout(() => {
+      updateToken()
 
-        navigation.navigate("Profile")
-
-      }, 1800)
 
     } catch (error) {
       setError(error.response.data.error);
@@ -56,39 +40,21 @@ const Register = ({ navigation }) => {
       </View>
       <View style={styles.inputView} >
         <TextInput
-          style={styles.inputText}
-          placeholder="Username"
-          placeholderTextColor="#003f5c"
-          value={username}
-          onChangeText={setUsername}
-        />
-      </View>
-      <View style={styles.inputView} >
-        <TextInput
           value={password}
-          style={styles.inputText}
           secureTextEntry={true}
+          style={styles.inputText}
           placeholder="Mật khẩu"
           placeholderTextColor="#003f5c"
           onChangeText={setPassword} />
       </View>
-      <View style={styles.inputView} >
-        <TextInput
-          value={confirmpassword}
-          style={styles.inputText}
-          secureTextEntry={true}
-          placeholder="Xác nhập mật khẩu"
-          placeholderTextColor="#003f5c"
-          onChangeText={setConfirmPassword} />
-      </View>
       <Text style={styles.textError}>
         {error}
       </Text>
-      <TouchableOpacity>
-        <Text style={styles.forgot} onPress={() => navigation.navigate('Login')}>Đã có tài khoản</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+        <Text style={styles.forgot}>Tạo tài khoản</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.loginBtn} onPress={loginHandler}>
-        <Text style={styles.loginText}>Đăng ký</Text>
+        <Text style={styles.loginText}>Đăng nhập</Text>
       </TouchableOpacity>
     </View>
   );
@@ -120,11 +86,12 @@ const styles = StyleSheet.create({
   },
   inputText: {
     height: 50,
-    color: "#0063a5"
+    fontWeight: "600",
   },
   forgot: {
     color: "#0063a5",
-    fontSize: 11
+    fontSize: 11,
+    fontWeight: "600",
   },
   loginBtn: {
     width: "80%",
@@ -137,12 +104,13 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   loginText: {
-    color: "white"
+    color: "white",
+    fontWeight: "600",
   },
   textError: {
     color: "red"
   }
 });
 
-export default Register;
+export default Login;
 

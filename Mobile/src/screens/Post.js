@@ -1,12 +1,17 @@
 import { useRef, useState } from "react";
 import {
-    Pressable,
+    TextInput,
     SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
+    Button, 
+    Image,
+    ScrollView
 } from "react-native";
+import * as ImagePicker from 'expo-image-picker';
+
 import {
     actions,
     RichEditor,
@@ -15,9 +20,27 @@ import {
 
 const Post = () => {
     const richText = useRef();
-
     const [descHTML, setDescHTML] = useState("");
+    const [title, setTitle] = useState("");
     const [showDescError, setShowDescError] = useState(false);
+    const [image, setImage] = useState(null);
+
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.canceled) {
+          setImage(result.assets[0].uri);
+        }
+      };
 
     const richTextHandle = (descriptionText) => {
         if (descriptionText) {
@@ -42,13 +65,26 @@ const Post = () => {
 
     return (
         <SafeAreaView edges={["bottom", "left", "right"]} style={{ flex: 1 }}>
+            <ScrollView>
             <View style={styles.container}>
-                <Pressable onPress={() => richText.current?.dismissKeyboard()}>
+            <View><Text>Tiêu đề</Text></View>
+            <View style={styles.viewTitle}>
+                <TextInput
+                style={styles.inputTitle}
+                placeholder="Title"
+                placeholderTextColor="#848b8e"
+                value={title}
+                onChangeText={setTitle}
+                />
+            </View>
+                <View><Text>Nội dung</Text></View>
+
+                {/* <Pressable onPress={() => richText.current?.dismissKeyboard()}>
                     <Text style={styles.headerStyle}>Your awesome Content</Text>
                     <View style={styles.htmlBoxStyle}>
                         <Text>{descHTML}</Text>
                     </View>
-                </Pressable>
+                </Pressable> */}
                 <View style={styles.richTextContainer}>
                     <RichEditor
                         ref={richText}
@@ -60,8 +96,8 @@ const Post = () => {
                     />
                     <RichToolbar
                         editor={richText}
-                        selectedIconTint="#873c1e"
-                        iconTint="#312921"
+                        selectedIconTint="#0063a5"
+                        iconTint="white"
                         actions={[
                             actions.insertImage,
                             actions.setBold,
@@ -77,9 +113,13 @@ const Post = () => {
                 </View>
                 {showDescError && (
                     <Text style={styles.errorTextStyle}>
-                        Your content shouldn't be empty 🤔
+                        Vui lòng nhập nội dung bài viết
                     </Text>
                 )}
+
+                
+                <Button title="Pick an image from camera roll" onPress={pickImage} />
+                {/* {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />} */}
 
                 <TouchableOpacity
                     style={styles.saveButtonStyle}
@@ -87,6 +127,8 @@ const Post = () => {
                     <Text style={styles.textButtonStyle}>Save</Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
+            
         </SafeAreaView>
     );
 }
@@ -95,11 +137,28 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         height: "100%",
-        backgroundColor: "#ccaf9b",
+        backgroundColor: "white",
         padding: 20,
         alignItems: "center",
     },
-
+    viewTitle:{
+        width: "100%",
+        marginVertical: 10,
+    },
+    inputTitle:{
+        borderRadius: 5,
+        borderWidth: 2,
+        borderColor: "#9bc5f9",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.23,
+        shadowRadius: 2.62,
+        elevation: 4,
+        fontSize: 18,
+    },
     headerStyle: {
         fontSize: 20,
         fontWeight: "600",
@@ -127,7 +186,7 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
         borderWidth: 1,
-        borderColor: "#ccaf9b",
+        borderColor: "#9bc5f9",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -140,8 +199,8 @@ const styles = StyleSheet.create({
     },
 
     richTextToolbarStyle: {
-        backgroundColor: "#c6c3b3",
-        borderColor: "#c6c3b3",
+        backgroundColor: "#9bc5f9",
+        borderColor: "#9bc5f9",
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         borderWidth: 1,
@@ -151,11 +210,10 @@ const styles = StyleSheet.create({
         color: "#FF0000",
         marginBottom: 10,
     },
-
     saveButtonStyle: {
-        backgroundColor: "#c6c3b3",
+        backgroundColor: "#0063a5",
         borderWidth: 1,
-        borderColor: "#c6c3b3",
+        borderColor: "#0063a5",
         borderRadius: 10,
         padding: 10,
         width: "25%",
@@ -175,7 +233,7 @@ const styles = StyleSheet.create({
     textButtonStyle: {
         fontSize: 18,
         fontWeight: "600",
-        color: "#312921",
+        color: "white",
     },
 });
 export default Post;
