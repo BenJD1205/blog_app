@@ -36,7 +36,7 @@ export default function Story({navigation,data}) {
           padding: 15,
           borderColor: 'gray',
         }}
-        
+        onPress={()=> console.log(navigation) }
       >
         <Card.Cover source={{ uri: `http://localhost:5000/storyImages/${data.image}` }} />
         <Card.Title

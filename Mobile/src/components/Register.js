@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Loading from "./Loading";
+
 
 const Register = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const loginHandler = async (e) => {
     e.preventDefault();
@@ -90,6 +93,9 @@ const Register = ({ navigation }) => {
       <TouchableOpacity style={styles.loginBtn} onPress={loginHandler}>
         <Text style={styles.loginText}>Đăng ký</Text>
       </TouchableOpacity>
+      {
+        loading ? <Loading /> : <></>
+      }
     </View>
   );
 };

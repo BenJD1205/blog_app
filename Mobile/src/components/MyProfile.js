@@ -3,9 +3,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image,TouchableOpacity } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
+import Loading from "./Loading";
+
 const Profile = ({ token, updateToken }) => {
     const [dataU, setDataU] = useState({})
-
+    const [loading,setLoading] = useState(false)
     const editDate = (createdAt) => {
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
@@ -21,7 +23,9 @@ const Profile = ({ token, updateToken }) => {
     }
 
     useEffect(() => {
+        setLoading(true)
         setTimeout(() => {
+
                 const controlAuth = async () => {
                     try {
                         const URI = 'http://localhost:5000'
@@ -32,9 +36,12 @@ const Profile = ({ token, updateToken }) => {
                             }
                         });
                         setDataU(data.user)
+                        setLoading(false)
+
                         AsyncStorage.setItem("dataUser", JSON.stringify(data.user))
                     }
                     catch (error) {
+                        setLoading(false)
                         AsyncStorage.clear()
                         updateToken()
                     }
@@ -45,43 +52,48 @@ const Profile = ({ token, updateToken }) => {
     }, [])
 
     return (
-        <View>
-            <View style={{ alignSelf: "center", marginTop: 20 }}>
-                <View style={styles.profileImage}>
-                    <Image source={{ uri: 'https://picsum.photos/700' }} style={styles.image} resizeMode="center"></Image>
-                </View>
-            </View>
-
-            <View style={styles.infoContainer}>
-                <Text style={[styles.text, { fontWeight: "blod", color: "#22577a", fontSize: 36 }]}>{dataU.username}</Text>
-            </View>
-
-
-            <Text style={[styles.subText, styles.recent]}>Thông tin</Text>
-            <View style={{ alignItems: "center" }}>
-                <View style={styles.recentItem}>
-                    <View style={styles.activityIndicator}></View>
-                    <View style={{ width: 250 }}>
-                        <Text style={[styles.text, { color: "#41444B", fontWeight: "300" }]}>
-                            Ngày tham gia: <Text style={{ fontWeight: "400" }}>{editDate(dataU.createdAt)}</Text>
-                        </Text>
+        <>
+            {loading ?
+            <Loading /> :
+            <>
+                <View style={{ alignSelf: "center", marginTop: 20 }}>
+                    <View style={styles.profileImage}>
+                        <Image source={{ uri: 'https://picsum.photos/700' }} style={styles.image} resizeMode="center"></Image>
                     </View>
                 </View>
-                <View style={styles.recentItem}>
-                    <View style={styles.activityIndicator}></View>
-                    <View style={{ width: 250 }}>
-                        <Text style={[styles.text, { color: "#41444B", fontWeight: "300" }]}>
-                            Email: <Text style={{ fontWeight: "400" }}>{dataU.email}</Text>
-                        </Text>
+
+                <View style={styles.infoContainer}>
+                    <Text style={[styles.text, { fontWeight: "600", color: "#22577a", fontSize: 36 }]}>{dataU.username}</Text>
+                </View>
+
+
+                <Text style={[styles.subText, styles.recent]}>Thông tin</Text>
+                <View style={{ alignItems: "center" }}>
+                    <View style={styles.recentItem}>
+                        <View style={styles.activityIndicator}></View>
+                        <View style={{ width: 250 }}>
+                            <Text style={[styles.text, { color: "#41444B", fontWeight: "300" }]}>
+                                Ngày tham gia: <Text style={{ fontWeight: "400" }}>{editDate(dataU.createdAt)}</Text>
+                            </Text>
+                        </View>
+                    </View>
+                    <View style={styles.recentItem}>
+                        <View style={styles.activityIndicator}></View>
+                        <View style={{ width: 250 }}>
+                            <Text style={[styles.text, { color: "#41444B", fontWeight: "300" }]}>
+                                Email: <Text style={{ fontWeight: "400" }}>{dataU.email}</Text>
+                            </Text>
+                        </View>
                     </View>
                 </View>
-            </View>
-            <View style={styles.infoContainer}>
-                    <TouchableOpacity  style={styles.btnLogout} onPress={handleLogout}>
-                        <Text style={styles.textLogout}>Đăng xuất</Text>
-                    </TouchableOpacity>
-            </View>
-        </View>
+                <View style={styles.infoContainer}>
+                        <TouchableOpacity  style={styles.btnLogout} onPress={handleLogout}>
+                            <Text style={styles.textLogout}>Đăng xuất</Text>
+                        </TouchableOpacity>
+                </View>
+            </> 
+            }
+        </>
 
     );
 }

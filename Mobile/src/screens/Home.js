@@ -9,10 +9,12 @@ import {
 import { Card, Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-// import Story from "../components/Story";
+import Loading from "../components/Loading";
 const Home = ({ navigation }) => {
 
     const [stories, setStories] = useState([])
+    const [loading, setLoading] = useState(false)
+
     const editDate = (createdAt) => {
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
@@ -22,19 +24,17 @@ const Home = ({ navigation }) => {
         return datestring
     }
 
-    // const formatHtml = (content) =>{
-    //     return{
-    //       html: `${content}`
-    //     };
-    // }
     const getImg = (name) =>{
       return `http://localhost:5000/storyImages/${name}`
     }
     useEffect(() => {
+      setLoading(true)
       const getStories = async () => {
   
         try {
           const URI = 'http://localhost:5000'
+          
+          
           const { data } = await axios.get(`${URI}/story/getAllStories`)
   
           setStories(data.data)
@@ -42,37 +42,45 @@ const Home = ({ navigation }) => {
         catch (error) {
           console.log(error)
         }
+        setLoading(false)
       }
       getStories()
     }, [])
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-      { stories.length ? 
-        stories.map((data) =>{
-          return (
-            <Card
-            style={styles.card}
-            key={data._id}
-            onPress={()=> navigation.navigate('About')}
-          >
-            <Card.Cover source={{ uri: getImg(data.image) }} />
-            <Card.Title
-              titleNumberOfLines={2}
-              title={data.title}
-              titleStyle={{ lineHeight: 26, fontWeight: "bold", fontSize: 20 }}
-            />
-            <Card.Content>
-              {/* <RenderHtml numberOfLines={2} source={formatHtml(data.content)} style={styles.content} /> */}
-              <Text numberOfLines={3}>{editDate(data.createdAt)} </Text>
-              {/* <Text><Icon name={like2} size={20} /> {data.likeCount} </Text> */}
-            </Card.Content>
-          </Card>
-          )
-        })
-        :  <Text> Chưa có bài viết nào</Text>}
-      </ScrollView>
-    </SafeAreaView>
+    <>
+      {
+        loading ? <Loading/> :   <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+        { stories.length ? 
+          stories.map((data) =>{
+            return (
+              <Card
+              style={styles.card}
+              key={data._id}
+              onPress={()=> navigation.navigate('PostInfo', {
+                slug: data.slug
+              })}
+            >
+              <Card.Cover source={{ uri: getImg(data.image) }} />
+              <Card.Title
+                titleNumberOfLines={2}
+                title={data.title}
+                titleStyle={{ lineHeight: 26, fontWeight: "bold", fontSize: 20 }}
+              />
+              <Card.Content>
+                <Text numberOfLines={3}>{editDate(data.createdAt)} </Text>
+                <Text><Icon name="like1" size={20} /> {data.likeCount} </Text>
+              </Card.Content>
+            </Card>
+            )
+          })
+          :  <Text> Chưa có bài viết nào</Text>}
+        </ScrollView>
+      </SafeAreaView>
+      }
+    </>
+    
+  
   );
 };
 

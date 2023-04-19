@@ -3,13 +3,17 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-nativ
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
+import Loading from "./Loading";
+
 const Login = ({ updateToken, navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const loginHandler = async (e) => {
     e.preventDefault();
     setError('')
+    setLoading(true)
 
     try {
       const URI = 'http://localhost:5000'
@@ -18,11 +22,11 @@ const Login = ({ updateToken, navigation }) => {
         { email, password }
       );
       await AsyncStorage.setItem("authToken", data.token);
-
+      setLoading(false)
       updateToken()
 
-
     } catch (error) {
+      setLoading(false)
       setError(error.response.data.error);
     }
   };
@@ -56,6 +60,7 @@ const Login = ({ updateToken, navigation }) => {
       <TouchableOpacity style={styles.loginBtn} onPress={loginHandler}>
         <Text style={styles.loginText}>Đăng nhập</Text>
       </TouchableOpacity>
+       {loading ?  <Loading/> : <></>}
     </View>
   );
 };

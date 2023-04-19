@@ -16,13 +16,14 @@ const Profile = ({ navigation }) => {
             console.log(e)
         }
     }
+    // console.log('Reder', token)
     useEffect(() => {
         getToken()
-    }, [token])
+    }, [])
 
     return (
         <>
-         {token ? <MyProfile updateToken={getToken} token={token} /> : <Login updateToken={getToken} navigation={navigation}/>}
+            {token ? <MyProfile updateToken={getToken} token={token} /> : <Login updateToken={getToken} navigation={navigation}/>}
         </>
     );
 }
